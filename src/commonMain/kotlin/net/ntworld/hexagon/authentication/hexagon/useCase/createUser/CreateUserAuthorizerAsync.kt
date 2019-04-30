@@ -5,18 +5,15 @@ import net.ntworld.hexagon.authentication.hexagon.RESOURCE_TYPE_USER
 import net.ntworld.hexagon.foundation.Argument
 import net.ntworld.hexagon.foundation.abac.*
 
-class CreateUserAuthorizer(
+class CreateUserAuthorizerAsync(
     private val authorizationService: AuthorizationService
-) : Authorizer, AuthorizationDataDirector {
+) : AuthorizerAsync, AuthorizationDataDirectorAsync {
 
-    override fun constructAuthorizationData(builder: AuthorizationDataBuilder, argument: Argument) {
+    override suspend fun constructAuthorizationDataAsync(builder: AuthorizationDataBuilder, argument: Argument) {
         builder.copyFrom(argument)
             .withCreateAction()
             .withResource(makeResource(RESOURCE_TYPE_USER))
     }
 
-    override fun authorize(data: AuthorizationData): Boolean {
-        return authorizationService.authorize(data)
-    }
-
+    override suspend fun authorizeAsync(data: AuthorizationData) = authorizationService.authorizeAsync(data)
 }

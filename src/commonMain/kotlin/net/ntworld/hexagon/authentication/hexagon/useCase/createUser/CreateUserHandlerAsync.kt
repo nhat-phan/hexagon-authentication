@@ -1,39 +1,45 @@
 package net.ntworld.hexagon.authentication.hexagon.useCase.createUser
 
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import net.ntworld.hexagon.authentication.*
 import net.ntworld.hexagon.authentication.hexagon.Util
 import net.ntworld.hexagon.authentication.hexagon.entity.UserImpl
-import net.ntworld.hexagon.foundation.Handler
+import net.ntworld.hexagon.foundation.HandlerAsync
 
-internal class CreateUserHandler(
+internal class CreateUserHandlerAsync(
     private val userRepository: UserRepository,
     private val emailService: EmailService,
     private val cryptoService: CryptoService,
     private val options: Options
-) : Handler<CreateUserArgument, User> {
+) : HandlerAsync<CreateUserArgument, User> {
 
-    override fun handle(argument: CreateUserArgument): UserImpl {
-        this.assertUserIsNotExists(argument.username, argument.email)
+    override suspend fun handleAsync(argument: CreateUserArgument) = GlobalScope.async {
+        assertUserIsNotExists(argument.username, argument.email)
 
         val salt = Util.generateCode(options.saltLength, options.saltCharset)
-        val encryptedPassword = this.cryptoService.encryptPassword(argument.password, salt)
+        val encryptedPassword = cryptoService.encryptPassword(argument.password, salt)
 
-        val record = this.userRepository.createUser(
+        val record = userRepository.createUserAsync(
             argument.username,
             argument.email,
             salt,
             encryptedPassword,
             !argument.shouldConfirmEmail
-        )
+        ).await()
 
         if (argument.shouldConfirmEmail) {
-            this.emailService.sendConfirmation(
-                argument.email,
-                Util.generateCode(options.codeLength, options.codeCharset)
-            )
+            launch {
+                emailService.sendConfirmation(
+                    argument.email,
+                    Util.generateCode(options.codeLength, options.codeCharset)
+                )
+            }
         }
 
-        return UserImpl(
+        UserImpl(
             id = record.id,
             username = record.username,
             email = record.email,
@@ -44,9 +50,9 @@ internal class CreateUserHandler(
         )
     }
 
-    private fun assertUserIsNotExists(username: String, email: String) {
-        if (this.userRepository.findByUsername(username) !== null ||
-            this.userRepository.findByEmail(email) !== null
+    private suspend fun assertUserIsNotExists(username: String, email: String) {
+        if (userRepository.findByUsernameAsync(username).await() !== null ||
+            userRepository.findByEmailAsync(email).await() !== null
         ) {
             throw Exception("Duplicated account.")
         }

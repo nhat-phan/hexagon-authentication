@@ -1,13 +1,13 @@
 package net.ntworld.hexagon.authentication
 
-import kotlinx.coroutines.Deferred
-import net.ntworld.hexagon.authentication.hexagon.useCase.createUser.CreateUserPort
+import net.ntworld.hexagon.authentication.hexagon.useCase.createUser.CreateUserPortAsync
 import net.ntworld.hexagon.foundation.Port
+import net.ntworld.hexagon.foundation.PortAsync
 
 class AuthenticationApi(private val spi: AuthenticationServiceProvider) {
 
-    fun createUserPort(): Port<CreateUserArgumentBuilder, User> {
-        return CreateUserPort(spi)
+    fun createUserPort(): PortAsync<CreateUserArgumentBuilder, User> {
+        return CreateUserPortAsync(spi)
     }
 
     fun inviteUserPort(): Port<InviteUserArgumentBuilder, Boolean> {
