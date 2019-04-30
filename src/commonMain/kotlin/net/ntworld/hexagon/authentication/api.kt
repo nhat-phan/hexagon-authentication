@@ -1,7 +1,7 @@
 package net.ntworld.hexagon.authentication
 
 import kotlinx.coroutines.Deferred
-import net.ntworld.hexagon.authentication.hexagon.userCase.createUser.CreateUserPort
+import net.ntworld.hexagon.authentication.hexagon.useCase.createUser.CreateUserPort
 import net.ntworld.hexagon.foundation.Port
 
 class AuthenticationApi(private val spi: AuthenticationServiceProvider) {

@@ -1,4 +1,4 @@
-package net.ntworld.hexagon.authentication.hexagon.userCase.createUser
+package net.ntworld.hexagon.authentication.hexagon.useCase.createUser
 
 import net.ntworld.hexagon.authentication.GuestActionArgument
 import net.ntworld.hexagon.foundation.ArgumentContext

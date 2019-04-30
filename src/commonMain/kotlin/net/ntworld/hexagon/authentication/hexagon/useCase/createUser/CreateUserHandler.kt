@@ -1,7 +1,8 @@
-package net.ntworld.hexagon.authentication.hexagon.userCase.createUser
+package net.ntworld.hexagon.authentication.hexagon.useCase.createUser
 
 import net.ntworld.hexagon.authentication.*
 import net.ntworld.hexagon.authentication.hexagon.Util
+import net.ntworld.hexagon.authentication.hexagon.entity.UserImpl
 import net.ntworld.hexagon.foundation.Handler
 
 internal class CreateUserHandler(
@@ -11,13 +12,13 @@ internal class CreateUserHandler(
     private val options: Options
 ) : Handler<CreateUserArgument, User> {
 
-    override fun handle(argument: CreateUserArgument): User {
+    override fun handle(argument: CreateUserArgument): UserImpl {
         this.assertUserIsNotExists(argument.username, argument.email)
 
         val salt = Util.generateCode(options.saltLength, options.saltCharset)
         val encryptedPassword = this.cryptoService.encryptPassword(argument.password, salt)
 
-        val user = this.userRepository.createUser(
+        val record = this.userRepository.createUser(
             argument.username,
             argument.email,
             salt,
@@ -31,7 +32,16 @@ internal class CreateUserHandler(
                 Util.generateCode(options.codeLength, options.codeCharset)
             )
         }
-        return user
+
+        return UserImpl(
+            id = record.id,
+            username = record.username,
+            email = record.email,
+            verified = record.verified,
+            lastLoginAt = record.lastLoginAt,
+            createdAt = record.createdAt,
+            updatedAt = record.updatedAt
+        )
     }
 
     private fun assertUserIsNotExists(username: String, email: String) {
