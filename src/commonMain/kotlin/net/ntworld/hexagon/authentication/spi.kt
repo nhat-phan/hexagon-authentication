@@ -19,6 +19,8 @@ interface Options {
         get() = ALPHABET_NUMBER
 }
 
+object DefaultOptions : Options {}
+
 interface UserRepository {
     suspend fun findByUsernameAsync(username: String): Deferred<User?>
 
@@ -52,5 +54,5 @@ interface AuthenticationServiceProvider {
 
     fun getCryptoService(tenantId: String): CryptoService
 
-    fun getOptions(): Options
+    fun getOptions(): Options = DefaultOptions
 }

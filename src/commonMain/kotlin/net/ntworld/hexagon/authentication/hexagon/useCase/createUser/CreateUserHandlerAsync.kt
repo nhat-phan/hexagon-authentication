@@ -50,11 +50,13 @@ internal class CreateUserHandlerAsync(
         )
     }
 
-    private suspend fun assertUserIsNotExists(username: String, email: String) {
-        if (userRepository.findByUsernameAsync(username).await() !== null ||
-            userRepository.findByEmailAsync(email).await() !== null
-        ) {
+    private suspend fun assertUserIsNotExists(username: String, email: String) = GlobalScope.launch {
+        val checkByUsername = async { userRepository.findByUsernameAsync(username).await() }
+        val checkByEmail = async { userRepository.findByEmailAsync(email).await() }
+
+        if (checkByUsername.await() !== null || checkByEmail.await() !== null) {
             throw Exception("Duplicated account.")
         }
     }
+
 }
