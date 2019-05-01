@@ -17,7 +17,7 @@ internal class CreateUserHandlerAsync(
 ) : HandlerAsync<CreateUserArgument, User> {
 
     override suspend fun handleAsync(argument: CreateUserArgument) = GlobalScope.async {
-        assertUserIsNotExists(argument.username, argument.email)
+        assertUserDoesNotExists(argument.username, argument.email)
 
         val salt = Util.generateCode(options.saltLength, options.saltCharset)
         val encryptedPassword = cryptoService.encryptPassword(argument.password, salt)
@@ -31,12 +31,10 @@ internal class CreateUserHandlerAsync(
         ).await()
 
         if (argument.shouldConfirmEmail) {
-            launch {
-                emailService.sendConfirmation(
-                    argument.email,
-                    Util.generateCode(options.codeLength, options.codeCharset)
-                )
-            }
+            emailService.sendConfirmation(
+                argument.email,
+                Util.generateCode(options.codeLength, options.codeCharset)
+            )
         }
 
         UserImpl(
@@ -50,9 +48,9 @@ internal class CreateUserHandlerAsync(
         )
     }
 
-    private suspend fun assertUserIsNotExists(username: String, email: String) = GlobalScope.launch {
-        val checkByUsername = async { userRepository.findByUsernameAsync(username).await() }
-        val checkByEmail = async { userRepository.findByEmailAsync(email).await() }
+    private suspend fun assertUserDoesNotExists(username: String, email: String) {
+        val checkByUsername = userRepository.findByUsernameAsync(username)
+        val checkByEmail = userRepository.findByEmailAsync(email)
 
         if (checkByUsername.await() !== null || checkByEmail.await() !== null) {
             throw Exception("Duplicated account.")

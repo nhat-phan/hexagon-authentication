@@ -12,7 +12,7 @@ apply plugin: 'maven-publish'
 
 kotlin {
     jvm()
-    js()
+    // js()
     // For ARM, should be changed to iosArm32 or iosArm64
     // For Linux, should be changed to e.g. linuxX64
     // For MacOS, should be changed to e.g. macosX64
@@ -29,6 +29,9 @@ kotlin {
             dependencies {
                 implementation kotlin('test-common')
                 implementation kotlin('test-annotations-common')
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.2.1"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1"
+                implementation "io.mockk:mockk-dsl:1.9.3"
             }
         }
         jvmMain {
@@ -42,6 +45,7 @@ kotlin {
                 implementation kotlin('test')
                 implementation kotlin('test-junit')
                 implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1'
+                implementation "io.mockk:mockk-dsl-jvm:1.9.3"
             }
         }
         jsMain {
@@ -53,6 +57,7 @@ kotlin {
         jsTest {
             dependencies {
                 implementation kotlin('test-js')
+                implementation "io.mockk:mockk-dsl-js:1.9.3"
             }
         }
     }

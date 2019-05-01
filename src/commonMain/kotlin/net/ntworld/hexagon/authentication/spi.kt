@@ -1,6 +1,7 @@
 package net.ntworld.hexagon.authentication
 
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import net.ntworld.hexagon.foundation.abac.AuthorizationData
 
 const val ALPHABET_NUMBER = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -22,19 +23,19 @@ interface Options {
 object DefaultOptions : Options {}
 
 interface UserRepository {
-    suspend fun findByUsernameAsync(username: String): Deferred<User?>
+    fun findByUsernameAsync(username: String): Deferred<User?>
 
-    suspend fun findByEmailAsync(email: String): Deferred<User?>
+    fun findByEmailAsync(email: String): Deferred<User?>
 
-    suspend fun createUserAsync(username: String, email: String, salt: String, password: String, verified: Boolean): Deferred<UserRecord>
+    fun createUserAsync(username: String, email: String, salt: String, password: String, verified: Boolean): Deferred<UserRecord>
 }
 
 interface EmailService {
-    suspend fun sendInvitation(recipient: String, code: String)
+    suspend fun sendInvitation(recipient: String, code: String): Job
 
-    suspend fun sendConfirmation(recipient: String, code: String)
+    suspend fun sendConfirmation(recipient: String, code: String): Job
 
-    suspend fun sendPasswordRecovery(recipient: String, code: String)
+    suspend fun sendPasswordRecovery(recipient: String, code: String): Job
 }
 
 interface CryptoService {
